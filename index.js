@@ -1,7 +1,7 @@
 'use strict';
 
 const request = require('request');
-const aws = require('aws-sdk')
+const aws = require('aws-sdk');
 
 class ServerlessPlugin {
   constructor(serverless, options) {
@@ -29,7 +29,7 @@ class ServerlessPlugin {
     const myKey = key;
     const myModule = this;
 
-    let PrePromise = function(data) {
+    let PrePromise = function() {
       return new Promise((resolve, reject) => {
         const params = {
           KeyId: myModule.serverless.service.custom.kms.keyId,
@@ -44,11 +44,16 @@ class ServerlessPlugin {
             resolve(data);
           }
         });
-      }).then(data => {return {"key": myKey, "value": data}});
-    }
+      }).then(data => {
+        return {
+          'key': myKey,
+          'value': data
+        };
+      });
+    };
 
-    let data = PrePromise(value);
-    return data
+    let data = PrePromise();
+    return data;
   }
 
   getVaultSecrets() {
@@ -57,13 +62,13 @@ class ServerlessPlugin {
     return new Promise((resolve, reject) => {
 
       var options = {
-        url: myModule.serverless.service.custom.vault.url + "/v1/" + myModule.serverless.service.custom.vault.secret,
+        url: myModule.serverless.service.custom.vault.url + '/v1/' + myModule.serverless.service.custom.vault.secret,
         headers: {
           'X-Vault-Token': myModule.serverless.service.custom.vault.token,
           'Content-Type':'application/json',
         },
-        strictSSL: myModule.serverless.service.custom.vault.ssl_check || false;
-      }
+        strictSSL: myModule.serverless.service.custom.vault.ssl_check || false
+      };
 
       function callbackT(error, response, body) {
 
@@ -72,14 +77,19 @@ class ServerlessPlugin {
         if (!error & response.statusCode == 200){
           var data = JSON.parse(body);
           var keysToVault = myModule.serverless.service.provider.environment;
-          console.log(keysToVault);
+
           myModule.serverless.service.provider.environment = [];
   
           for (var key in keysToVault) {
             if (data.data[keysToVault[key]]) {
-               arrayData.push(myModule.kmsEncryptVariable(keysToVault[key] , data.data[keysToVault[key]]));
+              arrayData.push(
+                myModule.kmsEncryptVariable(
+                  keysToVault[key],
+                  data.data[keysToVault[key]]
+                )
+              );
             } else  {
-              myModule.serverless.cli.log(`Key ${key} var not found on vault to be encrypted by kms`);
+              myModule.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
             }
           }
   
@@ -87,8 +97,8 @@ class ServerlessPlugin {
             myModule.serverless.service.provider.environment = {};
 
             for (var rst in result) {
-              var key = result[rst]["key"].toString();
-              var value = result[rst]["value"].CiphertextBlob.toString('base64');
+              var key = result[rst]['key'].toString();
+              var value = result[rst]['value'].CiphertextBlob.toString('base64');
 
               myModule.serverless.service.provider.environment[key] = value;
             }
@@ -96,12 +106,12 @@ class ServerlessPlugin {
           });
 
         } else {
-          myModule.serverless.cli.log(`Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again`); 
+          myModule.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
+          reject(myModule);
         }
       }
-      request.get(options, callbackT.bind(myModule))
-
-    })
+      request.get(options, callbackT.bind(myModule));
+    });
 
   }
 }

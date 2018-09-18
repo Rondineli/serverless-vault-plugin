@@ -1,11 +1,52 @@
 {
   "name": "serverless-vault-plugin",
-  "description": "",
+  "description": "Serverless plugin for retrieve secrets from vault and input on kms",
   "version": "0.1.0",
   "dependencies": {
     "request": "^2.88.0",
     "serverless-plugin-scripts": "^1.0.2",
     "aws-sdk": "2.313.0"
   },
-  "devDependencies": {}
+  "engines": {
+    "node": ">=4.0"
+  },
+  "author": "Rondineli Araujo (rondineli.gomes.araujo@gmail.com",
+  "contributors": [
+    "Pedro Araujo"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rondineli/serverless-vault-plugin.git"
+  },
+  "keywords": [
+    "serverless framework plugin",
+    "serverless applications",
+    "serverless plugins",
+    "kms",
+    "encryption",
+    "environment variables",
+    "lambda",
+    "aws",
+    "aws lambda",
+    "amazon",
+    "amazon web services",
+    "serverless.com"
+  ],
+  "main": "index.js",
+  "bin": {},
+  "scripts": {
+    "test": "mocha -t 10000",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^4.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Rondineli/serverless-vault-plugin/issues"
+  },
+  "homepage": "https://github.com/Rondineli/serverless-vault-plugin#readme",
+  "directories": {
+    "test": "test"
+  }
 }
