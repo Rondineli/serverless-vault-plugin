@@ -1,0 +1,36 @@
+service: rf-mir-lambda
+
+plugins:
+  - serverless-vault-plugin
+
+custom:
+  config: ${file(env/${opt:stage}.yml)}
+
+  vault:
+    token: "08c335c6-0fa2-9e56-4788-2c9e24ff8996"
+    url: "https://192.168.21.85:8200"
+    secret: "secret/devops"
+    ssl_check: false
+  kms:
+    keyId: ${env:KEY_KMS_ID}  
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: ${opt:stage, 'dev'}
+  region: us-west-2
+  environment:
+    - FOO
+    - BAR
+    - VAR
+
+functions:
+  hello:
+    handler: handler.hello
+
+package:
+  include:
+    - handler.py
+
+  exclude:
+    - '**/*'

@@ -3,9 +3,10 @@
   "description": "Serverless plugin for retrieve secrets from vault and input on kms",
   "version": "0.1.0",
   "dependencies": {
+    "aws-sdk": "2.313.0",
     "request": "^2.88.0",
-    "serverless-plugin-scripts": "^1.0.2",
-    "aws-sdk": "2.313.0"
+    "serverless": "^1.32.0",
+    "serverless-plugin-scripts": "^1.0.2"
   },
   "engines": {
     "node": ">=4.0"
@@ -40,7 +41,10 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "eslint": "^4.0.0"
+    "eslint": "^4.0.0",
+    "mocha": "5.2.0",
+    "serverless": "^1.27.2",
+    "chai": "^4.0.2"
   },
   "bugs": {
     "url": "https://github.com/Rondineli/serverless-vault-plugin/issues"
