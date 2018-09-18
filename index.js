@@ -83,7 +83,7 @@ class ServerlessPlugin {
             }
           }
   
-            Promise.all(arrayData).then(function (result) {
+          Promise.all(arrayData).then(function (result) {
             myModule.serverless.service.provider.environment = {};
 
             for (var rst in result) {
@@ -92,14 +92,12 @@ class ServerlessPlugin {
 
               myModule.serverless.service.provider.environment[key] = value;
             }
-            console.log(myModule.serverless.service.provider);
             resolve(myModule);
           });
 
         } else {
           myModule.serverless.cli.log(`Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again`); 
         }
-        //this.hooks["after:vault:vault"] = this.cleanUpAssets.bind(this)
       }
       request.get(options, callbackT.bind(myModule))
 
