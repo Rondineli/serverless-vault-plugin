@@ -10,7 +10,7 @@ I have been using vault as my store secret an it's been working well since then 
 Well, altho we are using vault, once I am retrieving it I need to handle it as a plain text, which is not good as well. So, I just store my secrets there and release it encrypted on kms to lambda and my app will be able see it encrypted.
 
 ## Topology
-[* Topology](img/topology.png)
+![* Topology](img/topology.png)
 
 ## How to use it?
 ### Add those configgs in your `serverless.yml`
