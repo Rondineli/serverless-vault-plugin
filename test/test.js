@@ -5,11 +5,10 @@ const execSync = require('child_process').execSync;
 const expect = require('chai').expect;
 const testUtils = require('./Utils');
 const fse = require('fs-extra');
-const App = require('../index')
+const App = require('../index');
 
 const serverless = new Serverless();
 serverless.init();
-console.log(path.join(serverless.config.serverlessPath, '..', 'bin', 'serverless'));
 const serverlessExec = path.join(serverless.config.serverlessPath, '..', 'bin', 'serverless');
 
 
@@ -19,9 +18,6 @@ fse.mkdirsSync(tmpDir);
 fse.copySync(path.join(process.env.MOCHA_PLUGIN_TEST_DIR, 'test-service'), tmpDir);
 process.chdir(tmpDir);
 
-
-
-
 describe ('Integration with stage option', () => {
   it('Should contain vault on params in cli info', () => {
     const test = execSync(`${serverlessExec}`);
@@ -29,7 +25,7 @@ describe ('Integration with stage option', () => {
 
     expect(result).to.have.string('vault ......................... It will get your secrets from vault and upload secretly to kms');
   });
-})
+});
 
 describe ('Testing retrieving data from vault', () => {
   const app = new App({}, {});
@@ -42,23 +38,23 @@ describe ('Testing retrieving data from vault', () => {
 
   it('Must check if const has env vars', () => {
     const serverless = {
-        service: {
-          provider: {
-            environment: {
-              TEST_VALUE_PROVIDER: 'test value provider',
-            },
+      service: {
+        provider: {
+          environment: {
+            TEST_VALUE_PROVIDER: 'test value provider',
           },
-          functions: {
-            testFunction2: {
-              environment: {
-                TEST_VALUE_FUNCTION: 'test value function 2',
-              },
+        },
+        functions: {
+          testFunction2: {
+            environment: {
+              TEST_VALUE_FUNCTION: 'test value function 2',
             },
           },
         },
+      },
     };
-    testUtils.setEnv(serverless, 'testFunction2')
+    testUtils.setEnv(serverless, 'testFunction2');
     expect(process.env.TEST_VALUE_PROVIDER).to.be.equal('test value provider');
     expect(process.env.TEST_VALUE_FUNCTION).to.be.equal('test value function 2'); 
   });
-})
+});
