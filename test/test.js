@@ -1,6 +1,6 @@
 'use strict';
-const path = require('path');
 const Serverless = require('serverless');
+const path = require('path');
 const execSync = require('child_process').execSync;
 const expect = require('chai').expect;
 const testUtils = require('./Utils');
@@ -11,18 +11,18 @@ const serverless = new Serverless();
 serverless.init();
 const serverlessExec = path.join(serverless.config.serverlessPath, '..', 'bin', 'serverless');
 
-
-process.env.MOCHA_PLUGIN_TEST_DIR = path.join(__dirname);
-const tmpDir = testUtils.getTmpDirPath();
-fse.mkdirsSync(tmpDir);
-fse.copySync(path.join(process.env.MOCHA_PLUGIN_TEST_DIR, 'test-service'), tmpDir);
-process.chdir(tmpDir);
-
 describe ('Integration with stage option', () => {
+  before(() => {
+    process.env.MOCHA_PLUGIN_TEST_DIR = path.join(__dirname);
+    const tmpDir = testUtils.getTmpDirPath();
+    fse.mkdirsSync(tmpDir);
+    fse.copySync(path.join(process.env.MOCHA_PLUGIN_TEST_DIR, 'test-service'), tmpDir);
+    process.chdir(tmpDir);
+
+  });
   it('Should contain vault on params in cli info', () => {
     const test = execSync(`${serverlessExec}`);
     const result = new Buffer(test, 'base64').toString();
-
     expect(result).to.have.string('vault ......................... It will get your secrets from vault and upload secretly to kms');
   });
 });

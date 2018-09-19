@@ -43,8 +43,9 @@
   "devDependencies": {
     "eslint": "^4.0.0",
     "mocha": "5.2.0",
-    "serverless": "^1.27.2",
-    "chai": "^4.0.2"
+    "serverless": "^1.32.0",
+    "chai": "4.0.2",
+    "serverless-plugin-scripts": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/Rondineli/serverless-vault-plugin/issues"

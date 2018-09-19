@@ -7,8 +7,8 @@ custom:
   config: ${file(env/${opt:stage}.yml)}
 
   vault:
-    token:"xxxxx"
-    url: "https://vaukt:8200"
+    token: "xxxxx"
+    url: "https://vault:8200"
     secret: "secret/path"
     ssl_check: false
   kms:
