@@ -171,6 +171,8 @@ class ServerlessPlugin {
           });
       } else if (methodAuth == 'token') {
         resolve(prePromisseDataCallBack());
+      } else {
+        reject('method key must be: "userpass" or "token" by default: "token"');
       }
     });
   }
