@@ -1,5 +1,5 @@
 # serverless-vault-plugin
-======
+
 [![CircleCI](https://circleci.com/gh/Rondineli/serverless-vault-plugin/tree/master.svg?style=svg)](https://circleci.com/gh/Rondineli/serverless-vault-plugin/tree/master)
 
 
