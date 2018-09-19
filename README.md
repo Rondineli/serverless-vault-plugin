@@ -17,6 +17,8 @@ Well, altho we are using vault, once I am retrieving it I need to handle it as a
 
 ## How to use it?
 ### Add those configgs in your `serverless.yml`
+
+#### Using token method auth
 ```
 custom:
   config: ${file(env/${opt:stage}.yml)}
@@ -29,6 +31,22 @@ custom:
   kms:
     keyId: ${env:KEY_KMS_ID}
 ```
+#### Using Userpass auth
+```
+custom:
+  config: ${file(env/${opt:stage}.yml)}
+
+  vault:
+    method: "Userpass"
+    user: "my vault user"
+    password: "my user password"
+    url: "https://vault:8200"
+    secret: "secret/path"
+    ssl_check: false
+  kms:
+    keyId: ${env:KEY_KMS_ID}
+```
+
 
 ### That's all you need, and then, add your env var as a list, like:
 ```
