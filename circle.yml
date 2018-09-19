@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: /tmp
   docker:
-    - image: node/8.12.0-alpine
+    - image: circleci/node:stretch
       environment:
       - DISPLAY: :99
 
