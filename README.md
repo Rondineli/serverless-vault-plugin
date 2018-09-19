@@ -1,4 +1,7 @@
 # serverless-vault-plugin
+======
+[![CircleCI](https://circleci.com/gh/Rondineli/serverless-vault-plugin/tree/master.svg?style=svg)](https://circleci.com/gh/Rondineli/serverless-vault-plugin/tree/master)
+
 
 ## Why to use it?
 Vault is an amazing tool to use to store secrets, I have been using it for a while. Since I've started to use lambda + serverless I have been looking for something that could allow me deploying it in a safe way, not writing files or commit my passwords on github to be able using a continuous deployment, so I decided to write my own plugin to solve my problem.
