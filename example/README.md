@@ -1,4 +1,4 @@
-### Example how to use the plugin
+## Example how to use the serverless-vault-plugin
 
 ### Install docker and run vault in your local env
 * To install docker look at [![docker instalation page](https://docs.docker.com/install/)]
@@ -33,3 +33,36 @@ Then, finnaly run your app deployment application:
 ```
 sls deploy -s dev
 ```
+
+### Example how to use the plugin with Userpass method auth
+Create a user/ pass on vault. Access your vault container and run: (inside of the container)
+```
+export VAULT_ADDR='http://0.0.0.0:8200'
+
+vault login -method=userpass username=myuser password=mypassword
+```
+
+then, add it your `serverless.yml`
+```
+custom:
+
+  vault:
+    method: "userpass"
+    user: "myuser"
+    password: "mypassword"
+    url: "https://localhost:8200"
+    secret: "secret/example-app"
+    ssl_check: false
+  kms:
+    keyId: ${env:KEY_KMS_ID}
+
+```
+
+### Sugestions:
+1. User always a valid certificate for vault
+2. Get preference to use userpass method with a expiration token ttl, userpass will retrieve a temp token to retrieve the passwords
+3. Never commit your passwords or users, use it as your env vars or try to create it in a separeted file the you can add in your gitignore
+4. Look always to your policies, set the right policies to your lambda app (to use kms using always less permissions as possible)
+5. Create a fork from this repository and contribute
+
+Cheers!
