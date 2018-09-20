@@ -1,0 +1,13 @@
+{
+  "name": "serverless-vault-example-app",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {
+    "aws-sdk": "^2.313.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "serverless-plugin-scripts": "^1.0.2",
+    "serverless-vault-plugin": "file:../../serverless-vault-plugin"
+  },
+  "devDependencies": { }
+}
