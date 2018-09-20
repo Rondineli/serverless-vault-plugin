@@ -1,7 +1,7 @@
 ## Example how to use the serverless-vault-plugin
 
 ### Install docker and run vault in your local env
-* To install docker look at [![docker instalation page](https://docs.docker.com/install/)]
+* To install docker look at [docker instalation page](https://docs.docker.com/install/)
 
 Then, run:
 ```
@@ -10,7 +10,7 @@ sudo docker run -dt --cap-add=IPC_LOCK -e "VAULT_DEV_ROOT_TOKEN_ID=4bea777b-9752
 
 It will create a docker container with vault and a root token: 4bea777b-9752-4c57-972d-02d091715254.
 
-Then, install npm and nodeJs: [![see it here](https://www.npmjs.com/get-npm)]
+Then, install npm and nodeJs: [see it here](https://www.npmjs.com/get-npm)
 
 then, run:
 ```
