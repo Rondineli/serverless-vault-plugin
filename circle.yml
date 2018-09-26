@@ -38,7 +38,7 @@ jobs:
          at: ~/serverless-vault-plugin
       - run:
          name: Authenticate with registry
-         command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+         command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/serverless-vault-plugin/.npmrc
       - run:
          name: Publishing package
          command: npm publish
