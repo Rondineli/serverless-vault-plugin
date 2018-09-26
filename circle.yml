@@ -41,7 +41,7 @@ jobs:
          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/serverless-vault-plugin/.npmrc
       - run:
          name: Publishing package
-         command: npm publish
+         command: cd ~/serverless-vault-plugin && npm publish
 
 
 workflows:
