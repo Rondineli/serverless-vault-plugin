@@ -51,11 +51,8 @@ workflows:
     jobs:
       - install_and_build:
           filters:
-            branchs:
-              ignore:
-                - dev
-                - master
-                - /feature\/.*
+            tags:
+              ignore: /.*/
 
   build-and-publish:
     jobs:
