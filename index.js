@@ -20,6 +20,7 @@ class ServerlessPlugin {
 
     this.hooks = {
       'before:package:initialize': this.getVaultSecrets.bind(this),
+      'before:vault:vault': this.getVaultSecrets.bind(this), // Shows encrypted passwords from vault and kms
     };
     this.kms = new aws.KMS({region: this.options.region});
   }
@@ -92,56 +93,122 @@ class ServerlessPlugin {
       this.serverless.service.custom.vault.token = token;
     }
 
-    const myOptions = {
-      url: this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret,
-      method: 'GET',
-      headers: {
-        'X-Vault-Token': this.serverless.service.custom.vault.token,
-        'Content-Type':'application/json',
-      },
-      strictSSL: this.serverless.service.custom.vault.ssl_check || false
-    };
+    if (this.serverless.service.custom.vault.secret.includes('/')) {
 
-    return new Promise((resolve, reject) => {
-      request.get(myOptions, (error, response = {}, body) => {
-        var arrayData = [];
-        if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200){
-          var data = JSON.parse(body);
-          var keysToVault = this.serverless.service.provider.environment;
+	    const myOptions = {
+	      url: this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret,
+	      method: 'GET',
+	      headers: {
+	        'X-Vault-Token': this.serverless.service.custom.vault.token,
+	        'Content-Type':'application/json',
+	      },
+	      strictSSL: this.serverless.service.custom.vault.ssl_check || false
+	    };
 
-          this.serverless.service.provider.environment = [];
-  
-          for (var key in keysToVault) {
-            if (data.data[keysToVault[key]]) {
-              arrayData.push(
-                this.kmsEncryptVariable(
-                  keysToVault[key],
-                  data.data[keysToVault[key]]
-                )
-              );
-            } else  {
-              this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
-            }
-          }
-          Promise.all(arrayData).then((result) => {
-            this.serverless.service.provider.environment = {};
+	    return new Promise((resolve, reject) => {
+	      request.get(myOptions, (error, response = {}, body) => {
+	        var arrayData = [];
+	        if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200){
+	          var data = JSON.parse(body);
+	          var keysToVault = this.serverless.service.provider.environment;
 
-            for (var rst in result) {
-              var key = result[rst]['key'].toString();
-              var value = result[rst]['value'].CiphertextBlob.toString('base64');
+	          this.serverless.service.provider.environment = [];
+	  
+	          for (var key in keysToVault) {
+	            if (data.data[keysToVault[key]]) {
+	              arrayData.push(
+	                this.kmsEncryptVariable(
+	                  keysToVault[key],
+	                  data.data[keysToVault[key]]
+	                )
+	              );
+	            } else  {
+	              this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
+	            }
+	          }
+	          Promise.all(arrayData).then((result) => {
+	            this.serverless.service.provider.environment = {};
 
-              this.serverless.service.provider.environment[key] = value;
-            }
-            resolve(this);
-          });
+	            for (var rst in result) {
+	              var key = result[rst]['key'].toString();
+	              var value = result[rst]['value'].CiphertextBlob.toString('base64');
 
-        } else {
-          this.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
-          this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
-          reject(this);
-        }
-      });
-    });
+	              this.serverless.service.provider.environment[key] = value;
+	            }
+	            resolve(this);
+	          });
+
+	        } else {
+	          this.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
+	          this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
+	          reject(this);
+	        }
+	      });
+	    });
+	} else {
+
+	    return new Promise((resolve, reject) => {
+
+		    var keysToVault = this.serverless.service.provider.environment;
+
+        this.serverless.service.provider.environment = [];
+
+        console.log(keysToVault);
+
+        for (var key in keysToVault) {
+
+        	console.log(key);
+
+        	const myOptions = {
+			      url: this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret + '/' + keysToVault[key],
+			      method: 'GET',
+			      headers: {
+			        'X-Vault-Token': this.serverless.service.custom.vault.token,
+			        'Content-Type':'application/json',
+			      },
+			      strictSSL: this.serverless.service.custom.vault.ssl_check || false
+			    };
+
+			    console.log(myOptions);
+
+
+   	      request.get(myOptions, (error, response = {}, body) => {
+
+   	        var arrayData = [];
+   	        if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200){
+   	          var data = JSON.parse(body);
+   	  
+
+   	          for (var secret in data.data) {
+   	          	arrayData.push(
+ 	                this.kmsEncryptVariable(
+ 	                  secret,
+ 	                  data.data[secret]
+ 	                )
+ 	              );
+   	          }
+   	          Promise.all(arrayData).then((result) => {
+   	            this.serverless.service.provider.environment = {};
+   
+   	            for (var rst in result) {
+   	              var key = result[rst]['key'].toString();
+   	              var value = result[rst]['value'].CiphertextBlob.toString('base64');
+   
+   	              this.serverless.service.provider.environment[key] = value;
+   	            }
+   	            console.log(this.serverless.service.provider.environment);
+   	            resolve(this);
+   	          });
+   
+   	        } else {
+   	          this.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
+   	          this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
+   	          reject(this);
+   	        }
+   	      });
+   	    }
+   	  });
+		}
   }
 
   getVaultSecrets() {
