@@ -32,7 +32,7 @@ describe ('Testing retrieving data from vault', () => {
   const hooks = Object.keys(app.hooks);
   
   it('Checking configs', () => {
-    expect(hooks).to.eql(['before:package:initialize']);
+    expect(hooks).to.eql(['before:package:initialize', 'before:vault:vault']);
     
   });
 
