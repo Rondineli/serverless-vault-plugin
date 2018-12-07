@@ -49,7 +49,7 @@ custom:
     keyId: ${env:KEY_KMS_ID}
 ```
 
-### Using single path secrets with multiples password
+### Using single path secrets with multiples passwords
 ```
 custom:
   config: ${file(env/${opt:stage}.yml)}
@@ -72,10 +72,10 @@ environment:
   - VAR_BAR
 ```
 
-It needs an structure at vault like: `vault write secret/path VAR_FOO=foo VAR_BAR=bar
+It needs a structure at vault like, `vault write secret/path VAR_FOO=foo VAR_BAR=bar
 
 
-### Using multiple path secrets with multiples or single password
+### Using multiple paths secrets with multiples or single password
 ```
 custom:
   config: ${file(env/${opt:stage}.yml)}
@@ -98,7 +98,7 @@ environment:
   - path_bar
 ```
 
-It needs an structure at vault like: `vault write secret/path_foo ANY_FOO=foo && vault write secret/path_bar ANY_BAR=bar`
+It needs a structure at vault like, `vault write secret/path_foo ANY_FOO=foo && vault write secret/path_bar ANY_BAR=bar`
 
 It will fetch all passwords under those paths.
 
