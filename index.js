@@ -20,6 +20,7 @@ class ServerlessPlugin {
 
     this.hooks = {
       'before:package:initialize': this.getVaultSecrets.bind(this),
+      'before:vault:vault': this.getVaultSecrets.bind(this), // Shows encrypted passwords from vault and kms
     };
     this.kms = new aws.KMS({region: this.options.region});
   }
@@ -66,7 +67,7 @@ class ServerlessPlugin {
       json: {
         'password': this.serverless.service.custom.vault.password
       },
-      strictSSL: this.serverless.service.custom.vault.ssl_check || false
+      strictSSL: !!this.serverless.service.custom.vault.ssl_check
     };
 
     return new Promise((resolve, reject) => {
@@ -87,7 +88,7 @@ class ServerlessPlugin {
    * @private
    * @returns {Promise}
    */
-  requestData(token = null) {
+  getSingleSecrets(token) {
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
@@ -104,14 +105,14 @@ class ServerlessPlugin {
 
     return new Promise((resolve, reject) => {
       request.get(myOptions, (error, response = {}, body) => {
-        var arrayData = [];
+        const arrayData = [];
         if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200){
-          var data = JSON.parse(body);
-          var keysToVault = this.serverless.service.provider.environment;
+          const data = JSON.parse(body);
+          const keysToVault = this.serverless.service.provider.environment;
 
           this.serverless.service.provider.environment = [];
   
-          for (var key in keysToVault) {
+          for (let key in keysToVault) {
             if (data.data[keysToVault[key]]) {
               arrayData.push(
                 this.kmsEncryptVariable(
@@ -126,9 +127,9 @@ class ServerlessPlugin {
           Promise.all(arrayData).then((result) => {
             this.serverless.service.provider.environment = {};
 
-            for (var rst in result) {
-              var key = result[rst]['key'].toString();
-              var value = result[rst]['value'].CiphertextBlob.toString('base64');
+            for (let rst in result) {
+              const key = result[rst]['key'].toString();
+              const value = result[rst]['value'].CiphertextBlob.toString('base64');
 
               this.serverless.service.provider.environment[key] = value;
             }
@@ -144,10 +145,82 @@ class ServerlessPlugin {
     });
   }
 
+  /**
+   * @private
+   * @returns {Promise}
+   */
+  getMultiplesSecrets(token) {
+    if (token) {
+      this.serverless.service.custom.vault.token = token;
+    }
+    return new Promise((resolve, reject) => {
+      const keysToVault = this.serverless.service.provider.environment;
+
+      this.serverless.service.provider.environment = [];
+
+      for (let key in keysToVault) {
+
+        const myOptions = {
+          url: this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret + '/' + keysToVault[key],
+          method: 'GET',
+          headers: {
+            'X-Vault-Token': this.serverless.service.custom.vault.token,
+            'Content-Type':'application/json',
+          },
+          strictSSL: !!this.serverless.service.custom.vault.ssl_check
+        };
+
+        request.get(myOptions, (error, response = {}, body) => {
+
+          const arrayData = [];
+          if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200){
+            const data = JSON.parse(body);
+
+    
+
+            for (let secret in data.data) {
+              arrayData.push(
+                this.kmsEncryptVariable(
+                  secret,
+                  data.data[secret]
+                )
+              );
+            }
+            Promise.all(arrayData).then((result) => {
+              this.serverless.service.provider.environment = {};
+ 
+              for (let rst in result) {
+                const key = result[rst]['key'].toString();
+                const value = result[rst]['value'].CiphertextBlob.toString('base64');
+ 
+                this.serverless.service.provider.environment[key] = value;
+              }
+              resolve(this);
+            });
+ 
+          } else {
+            this.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
+            this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
+            reject(this);
+          }
+        });
+      }
+    });
+
+  }
+
   getVaultSecrets() {
     const methodAuth = this.serverless.service.custom.vault.method || 'token';
 
     return new Promise((resolve, reject) => {
+      this.method = '';
+
+      if (this.serverless.service.custom.vault.secret.includes('/')) {
+        this.method = this.getSingleSecrets;
+      } else {
+        this.method = this.getMultiplesSecrets;
+      }
+
       if (methodAuth === 'userpass') {
         if ((!this.serverless.service.custom.vault.user) || (!this.serverless.service.custom.vault.password)){
           this.serverless.cli.log('You need set user, pass to this type of auth');
@@ -155,10 +228,10 @@ class ServerlessPlugin {
         }
         this.requestLoginToken().then(function (result) {
           const token = result['auth']['client_token'];
-          resolve(this.requestData(token));
+          resolve(this.method(token));
         });
       } else if (methodAuth === 'token') {
-        resolve(this.requestData());
+        resolve(this.method());
       } else {
         reject('method key must be: "userpass" or "token" by default: "token"');
       }
