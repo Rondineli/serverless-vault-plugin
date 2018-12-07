@@ -88,7 +88,7 @@ class ServerlessPlugin {
    * @private
    * @returns {Promise}
    */
-  getSingleSecrets(token = null ) {
+  getSingleSecrets(token) {
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
@@ -149,7 +149,7 @@ class ServerlessPlugin {
    * @private
    * @returns {Promise}
    */
-  getMultiplesSecrets(token = null ) {
+  getMultiplesSecrets(token) {
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
