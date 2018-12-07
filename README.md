@@ -72,7 +72,7 @@ environment:
   - VAR_BAR
 ```
 
-It needs a structure at vault like, `vault write secret/path VAR_FOO=foo VAR_BAR=bar
+It needs a structure at vault like, `vault write secret/path VAR_FOO=foo VAR_BAR=bar`
 
 
 ### Using multiple paths secrets with multiples or single password
