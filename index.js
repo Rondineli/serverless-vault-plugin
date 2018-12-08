@@ -135,9 +135,8 @@ class ServerlessPlugin {
               this.serverless.service.provider.environment[key] = value;
             }
             for (let ignore in ignoreVars.ignore) {
-              this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0]
+              this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0];
             }
-            console.log(this.serverless.service.provider.environment);
             resolve(this);
           });
 
@@ -201,7 +200,7 @@ class ServerlessPlugin {
                 this.serverless.service.provider.environment[key] = value;
               }
               for (let ignore in ignoreVars.ignore) {
-                this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0]
+                this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0];
               }
               resolve(this);
             });
@@ -222,7 +221,7 @@ class ServerlessPlugin {
     var ignoreVars = '';
 
     for (var i = 0; i < this.serverless.service.provider.environment.length; i++) {
-      if (this.serverless.service.provider.environment[i].hasOwnProperty("ignore")) {
+      if (this.serverless.service.provider.environment[i].hasOwnProperty('ignore')) {
         ignoreVars = this.serverless.service.provider.environment[i];
         this.serverless.service.provider.environment.splice(i, 1);
       }
