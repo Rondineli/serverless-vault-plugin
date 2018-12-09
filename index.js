@@ -89,7 +89,7 @@ class ServerlessPlugin {
    * @private
    * @returns {Promise}
    */
-  getSingleSecrets(token, ignoreVars) {
+  getSingleSecrets(token) {
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
@@ -134,9 +134,6 @@ class ServerlessPlugin {
 
               this.serverless.service.provider.environment[key] = value;
             }
-            for (let ignore in ignoreVars.ignore) {
-              this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0];
-            }
             resolve(this);
           });
 
@@ -153,7 +150,7 @@ class ServerlessPlugin {
    * @private
    * @returns {Promise}
    */
-  getMultiplesSecrets(token, ignoreVars) {
+  getMultiplesSecrets(token) {
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
@@ -199,9 +196,6 @@ class ServerlessPlugin {
  
                 this.serverless.service.provider.environment[key] = value;
               }
-              for (let ignore in ignoreVars.ignore) {
-                this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0];
-              }
               resolve(this);
             });
           
@@ -243,12 +237,18 @@ class ServerlessPlugin {
         }
         this.requestLoginToken().then(function (result) {
           const token = result['auth']['client_token'];
-          resolve(this.method(token, ignoreVars));
+          resolve(this.method(token));
         });
       } else if (methodAuth === 'token') {
-        resolve(this.method(null, ignoreVars));
+        resolve(this.method(null));
       } else {
         reject('method key must be: "userpass" or "token" by default: "token"');
+      }
+    }).then(() => {
+      if (ignoreVars.hasOwnProperty('ignore')) {
+        for (let ignore in ignoreVars.ignore) {
+          this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0];
+        }
       }
     });
 
