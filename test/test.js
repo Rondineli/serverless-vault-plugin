@@ -30,7 +30,7 @@ describe ('Integration with stage option', () => {
 describe ('Testing retrieving data from vault', () => {
   const app = new App({}, {});
   const hooks = Object.keys(app.hooks);
-  const commands = Object.keys(app.commands)
+  const commands = Object.keys(app.commands);
   
   it('Checking configs', () => {
     expect(hooks).to.eql(['before:package:initialize', 'before:vault:vault']);
@@ -38,10 +38,9 @@ describe ('Testing retrieving data from vault', () => {
   });
 
   it('Checking commands', () => {
-  	console.log(commands)
     expect(commands).to.eql([ 'vault' ]);
-    expect(app.commands.vault.usage).to.have.string('It will get your secrets from vault and upload secretly to kms')
-    expect(app.commands.vault.lifecycleEvents).to.eql(['vault'])
+    expect(app.commands.vault.usage).to.have.string('It will get your secrets from vault and upload secretly to kms');
+    expect(app.commands.vault.lifecycleEvents).to.eql(['vault']);
     
   });
 
