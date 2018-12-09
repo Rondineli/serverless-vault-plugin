@@ -23,6 +23,7 @@ class ServerlessPlugin {
       'before:vault:vault': this.getVaultSecrets.bind(this), // Shows encrypted passwords from vault and kms
     };
     this.kms = new aws.KMS({region: this.options.region});
+
   }
 
   /**
@@ -197,7 +198,7 @@ class ServerlessPlugin {
               }
               resolve(this);
             });
- 
+          
           } else {
             this.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
             this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
@@ -211,6 +212,14 @@ class ServerlessPlugin {
 
   getVaultSecrets() {
     const methodAuth = this.serverless.service.custom.vault.method || 'token';
+    var ignoreVars = '';
+
+    for (var i = 0; i < this.serverless.service.provider.environment.length; i++) {
+      if (this.serverless.service.provider.environment[i].hasOwnProperty('ignore')) {
+        ignoreVars = this.serverless.service.provider.environment[i];
+        this.serverless.service.provider.environment.splice(i, 1);
+      }
+    }
 
     return new Promise((resolve, reject) => {
       this.method = '';
@@ -231,11 +240,18 @@ class ServerlessPlugin {
           resolve(this.method(token));
         });
       } else if (methodAuth === 'token') {
-        resolve(this.method());
+        resolve(this.method(null));
       } else {
         reject('method key must be: "userpass" or "token" by default: "token"');
       }
+    }).then(() => {
+      if (ignoreVars.hasOwnProperty('ignore')) {
+        for (let ignore in ignoreVars.ignore) {
+          this.serverless.service.provider.environment[Object.keys(ignoreVars.ignore[ignore])[0]] = Object.values(ignoreVars.ignore[ignore])[0];
+        }
+      }
     });
+
   }
 }
 

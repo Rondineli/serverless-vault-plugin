@@ -1,0 +1,6 @@
+SecretVaultPath: secret/example-app
+
+environmentVars:
+  - SECRET_1
+  - SECRET_2
+  - SECRET_3

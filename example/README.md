@@ -24,6 +24,7 @@ It will create a `node_modules` path.
 export VAULT_ADDR='http://0.0.0.0:8200'
 
 vault write secret/example-app SECRET_1="foo" SECRET_2="bar" SECRET_3="foobar"
+vault write secret/other-example-app SECRET_4="foo"
 ```
 
 -- **Set your token as env var in your deployment machine** (or your local machine) `*Pssiu: It is just to not let you commit any token on serverless.yml file.`
