@@ -87,15 +87,19 @@ class ServerlessPlugin {
 
   /**
    * @private
+   * @param {*} token
+   * @param {*} baseUrl
    * @returns {Promise}
    */
-  getSingleSecrets(token) {
+  getSingleSecrets(token, baseUrl) {
+    const engineVersion = this.serverless.service.custom.vault.version || 'v1';
+
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
 
     const myOptions = {
-      url: this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret,
+      url: baseUrl,
       method: 'GET',
       headers: {
         'X-Vault-Token': this.serverless.service.custom.vault.token,
@@ -113,20 +117,38 @@ class ServerlessPlugin {
 
           this.serverless.service.provider.environment = [];
   
-          for (let key in keysToVault) {
-            if (data.data[keysToVault[key]]) {
-              arrayData.push(
-                this.kmsEncryptVariable(
-                  keysToVault[key],
-                  data.data[keysToVault[key]]
-                )
-              );
-            } else  {
-              this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
+          if (engineVersion == 'v1') {
+            for (let key in keysToVault) {
+              if (data.data[keysToVault[key]]) {
+                arrayData.push(
+                  this.kmsEncryptVariable(
+                    keysToVault[key],
+                    data.data[keysToVault[key]]
+                  )
+                );
+              } else  {
+                this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
+              }
             }
+          } else if (engineVersion == 'v2'){
+            for (let key in keysToVault) {
+              if (data.data.data[keysToVault[key]]) {
+                arrayData.push(
+                  this.kmsEncryptVariable(
+                    keysToVault[key],
+                    data.data.data[keysToVault[key]]
+                  )
+                );
+              } else  {
+                this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
+              }
+            }
+          } else {
+            this.serverless.cli.log('You need set an engine: \'v1\' or \'v2\'');
+            reject(this);
           }
+          this.serverless.service.provider.environment = {};
           Promise.all(arrayData).then((result) => {
-            this.serverless.service.provider.environment = {};
 
             for (let rst in result) {
               const key = result[rst]['key'].toString();
@@ -148,21 +170,24 @@ class ServerlessPlugin {
 
   /**
    * @private
+   * @param {*} token
+   * @param {*} baseUrl
    * @returns {Promise}
    */
-  getMultiplesSecrets(token) {
+  getMultiplesSecrets(token, baseUrl) {
     if (token) {
       this.serverless.service.custom.vault.token = token;
     }
     return new Promise((resolve, reject) => {
       const keysToVault = this.serverless.service.provider.environment;
+      const engineVersion = this.serverless.service.custom.vault.version || 'v1';
 
-      this.serverless.service.provider.environment = [];
+      this.serverless.service.provider.environment = {};
 
       for (let key in keysToVault) {
 
         const myOptions = {
-          url: this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret + '/' + keysToVault[key],
+          url: baseUrl + '/' + keysToVault[key],
           method: 'GET',
           headers: {
             'X-Vault-Token': this.serverless.service.custom.vault.token,
@@ -177,18 +202,30 @@ class ServerlessPlugin {
           if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200){
             const data = JSON.parse(body);
 
-    
+            if (engineVersion == 'v1') {
 
-            for (let secret in data.data) {
-              arrayData.push(
-                this.kmsEncryptVariable(
-                  secret,
-                  data.data[secret]
-                )
-              );
+              for (let secret in data.data) {
+                arrayData.push(
+                  this.kmsEncryptVariable(
+                    secret,
+                    data.data[secret]
+                  )
+                );
+              }
+            } else if (engineVersion == 'v2') {
+              for (let secret in data.data.data) {
+                arrayData.push(
+                  this.kmsEncryptVariable(
+                    secret,
+                    data.data.data[secret]
+                  )
+                );
+              }
+            } else {
+              this.serverless.cli.log('You need set an engine: \'v1\' or \'v2\'');
+              reject(this);
             }
             Promise.all(arrayData).then((result) => {
-              this.serverless.service.provider.environment = {};
  
               for (let rst in result) {
                 const key = result[rst]['key'].toString();
@@ -210,9 +247,15 @@ class ServerlessPlugin {
 
   }
 
+  /**
+   * @private
+   * @returns {Promise}
+   */
   getVaultSecrets() {
     const methodAuth = this.serverless.service.custom.vault.method || 'token';
+    const engineVersion = this.serverless.service.custom.vault.version || 'v1';
     var ignoreVars = '';
+    var baseUrl = '';
 
     for (var i = 0; i < this.serverless.service.provider.environment.length; i++) {
       if (this.serverless.service.provider.environment[i].hasOwnProperty('ignore')) {
@@ -224,9 +267,24 @@ class ServerlessPlugin {
     return new Promise((resolve, reject) => {
       this.method = '';
 
-      if (this.serverless.service.custom.vault.secret.includes('/')) {
+      if ((this.serverless.service.custom.vault.secret.includes('/')) && (engineVersion == 'v1')) {
+
+        baseUrl = this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret;
         this.method = this.getSingleSecrets;
+      } else if ((this.serverless.service.custom.vault.secret.includes('/')) && (engineVersion == 'v2')){
+
+        var splitPath = this.serverless.service.custom.vault.secret.split('/');
+        var secretBase = splitPath[0] + '/data/' + splitPath[1];
+        baseUrl = this.serverless.service.custom.vault.url + '/v1/' + secretBase;
+        this.method = this.getSingleSecrets;
+
+      } else if ((!this.serverless.service.custom.vault.secret.includes('/')) && (engineVersion == 'v2')) {
+
+        baseUrl = this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret + '/data';
+        this.method = this.getMultiplesSecrets;
+
       } else {
+        baseUrl = this.serverless.service.custom.vault.url + '/v1/' + this.serverless.service.custom.vault.secret;
         this.method = this.getMultiplesSecrets;
       }
 
@@ -237,12 +295,12 @@ class ServerlessPlugin {
         }
         this.requestLoginToken().then(function (result) {
           const token = result['auth']['client_token'];
-          resolve(this.method(token));
+          resolve(this.method(token, baseUrl));
         });
       } else if (methodAuth === 'token') {
-        resolve(this.method(null));
+        resolve(this.method(null, baseUrl));
       } else {
-        reject('method key must be: "userpass" or "token" by default: "token"');
+        reject('method key must be: \'userpass\' or \'token\' by default: \'token\'');
       }
     }).then(() => {
       if (ignoreVars.hasOwnProperty('ignore')) {
@@ -251,7 +309,6 @@ class ServerlessPlugin {
         }
       }
     });
-
   }
 }
 
