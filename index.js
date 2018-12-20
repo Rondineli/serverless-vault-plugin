@@ -293,7 +293,7 @@ class ServerlessPlugin {
           this.serverless.cli.log('You need set user, pass to this type of auth');
           reject('set user, pass to moving on...');
         }
-        this.requestLoginToken().then(function (result) {
+        this.requestLoginToken().then((result) => {
           const token = result['auth']['client_token'];
           resolve(this.method(token, baseUrl));
         });
