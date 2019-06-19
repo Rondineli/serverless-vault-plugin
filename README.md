@@ -30,6 +30,7 @@ custom:
     url: "https://vault:8200"
     secret: "secret/path"
     ssl_check: false
+    version: "v1"
   kms:
     keyId: ${env:KEY_KMS_ID}
 ```
@@ -45,6 +46,7 @@ custom:
     url: "https://vault:8200"
     secret: "secret/path"
     ssl_check: false
+    version: "v1"
   kms:
     keyId: ${env:KEY_KMS_ID}
 ```
@@ -61,6 +63,7 @@ custom:
     url: "https://vault:8200"
     secret: "secret/path"
     ssl_check: false
+    version: "v1"
   kms:
     keyId: ${env:KEY_KMS_ID}
 ```
@@ -87,6 +90,7 @@ custom:
     url: "https://vault:8200"
     secret: "secret"
     ssl_check: false
+    version: "v1"
   kms:
     keyId: ${env:KEY_KMS_ID}
 ```
