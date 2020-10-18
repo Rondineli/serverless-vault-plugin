@@ -127,7 +127,7 @@ class ServerlessPlugin {
                   )
                 );
               } else  {
-                this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
+                this.serverless.cli.log('Secret key ' + key + ' not found on vault, it will not be encrypted by kms');
               }
             }
           } else if (engineVersion == 'v2'){
@@ -140,11 +140,11 @@ class ServerlessPlugin {
                   )
                 );
               } else  {
-                this.serverless.cli.log('Key ' + key + 'var not found on vault to be encrypted by kms');
+                this.serverless.cli.log('Secret key ' + key + ' not found on vault, it will not be encrypted by kms');
               }
             }
           } else {
-            this.serverless.cli.log('You need set an engine: \'v1\' or \'v2\'');
+            this.serverless.cli.log('You need to set an engine version: \'v1\' or \'v2\'');
             reject(this);
           }
           this.serverless.service.provider.environment = {};
@@ -160,8 +160,10 @@ class ServerlessPlugin {
           });
 
         } else {
-          this.serverless.cli.log('Problems to retrieve keys from vault: Check your path and your address and make sure you have everything done before run it again'); 
-          this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
+          this.serverless.cli.log('Problems retrieving keys from vault: Check your secret uri, current uri: ' + baseUrl); 
+          if (response.statusCode == '401' || response.statusCode == '403') {
+            this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
+          }
           reject(this);
         }
       });
@@ -274,7 +276,8 @@ class ServerlessPlugin {
       } else if ((this.serverless.service.custom.vault.secret.includes('/')) && (engineVersion == 'v2')){
 
         var splitPath = this.serverless.service.custom.vault.secret.split('/');
-        var secretBase = splitPath[0] + '/data/' + splitPath[1];
+        splitPath.shift();
+        var secretBase = 'secret/data/' + splitPath.joint('/');
         baseUrl = this.serverless.service.custom.vault.url + '/v1/' + secretBase;
         this.method = this.getSingleSecrets;
 
