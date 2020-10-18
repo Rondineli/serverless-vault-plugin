@@ -277,7 +277,7 @@ class ServerlessPlugin {
 
         var splitPath = this.serverless.service.custom.vault.secret.split('/');
         splitPath.shift();
-        var secretBase = 'secret/data/' + splitPath.joint('/');
+        var secretBase = 'secret/data/' + splitPath.join('/');
         baseUrl = this.serverless.service.custom.vault.url + '/v1/' + secretBase;
         this.method = this.getSingleSecrets;
 
