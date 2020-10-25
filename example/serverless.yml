@@ -1,4 +1,4 @@
-service: rf-mir-lambda
+service: serverless-vault-plugin
 
 plugins:
   - serverless-vault-plugin
