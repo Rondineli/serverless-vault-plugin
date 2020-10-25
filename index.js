@@ -336,10 +336,9 @@ class ServerlessPlugin {
         resolve(this.method(null, baseUrl));
       } else if (methodAuth === 'approle') {
         this.requestappRoleSecret().then((result) => {
-          console.log(result)
           const token = result['auth']['client_token'];
           resolve(this.method(token, baseUrl));
-        })
+        });
       } else {
         reject('method key must be: \'userpass\' or \'token\' or \'approle\' by default: \'token\'');
       }
