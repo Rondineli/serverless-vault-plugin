@@ -13,8 +13,7 @@ jobs:
     working_directory: ~/serverless-vault-plugin
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker #    docker_layer_caching: true
       - run: npm i
       - run:
           name: CodeStyle
