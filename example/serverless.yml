@@ -8,10 +8,14 @@ custom:
   config: ${file(env/${opt:stage}.yml)}
 
   vault:
-    token: ${env:TOKEN_VAULT}
-    url: "https://localhost:8200"
+    #token: ${env:TOKEN_VAULT}
+    role_id: ${env:TOKEN_VAULT}
+    secret_id: "0707be04-ec76-26e2-7c3c-f91246559a79"
+    method: "approle"
+    url: "http://localhost:8200"
     secret: ${self:custom.config.SecretVaultPath}
     ssl_check: false
+    version: "v2"
   kms:
     keyId: ${env:KEY_KMS_ID}
 
@@ -19,7 +23,7 @@ provider:
   name: aws
   runtime: python3.6
   stage: ${opt:stage, 'dev'}
-  region: us-west-2
+  region: us-east-1
   environment: ${self:custom.config.environmentVars}
 
 functions:

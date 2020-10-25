@@ -22,9 +22,15 @@ It will create a `node_modules` path.
 -- **Access your container and add the following commands** (inside of the container).
 ```
 export VAULT_ADDR='http://0.0.0.0:8200'
+export VAULT_TOKEN='4bea777b-9752-4c57-972d-02d091715254'
 
-vault write secret/example-app SECRET_1="foo" SECRET_2="bar" SECRET_3="foobar"
-vault write secret/other-example-app SECRET_4="foo"
+vault kv put secret/example-app SECRET_1="foo" SECRET_2="bar" SECRET_3="foobar"
+vault kv put secret/other-example-app SECRET_4="foo"
+```
+
+-- **To make sure the secrets has been writeen, check by getting it**
+```
+vault kv get secret/example-app
 ```
 
 -- **Set your token as env var in your deployment machine** (or your local machine) `*Pssiu: It is just to not let you commit any token on serverless.yml file.`
@@ -33,7 +39,21 @@ export TOKEN_VAULT=4bea777b-9752-4c57-972d-02d091715254.
 ```
 -- **Finnaly, run your app deployment application**
 ```
-sls deploy -s dev
+sls deploy -s dev -r us-east-1
+```
+### Example how to use the plugin with AppRole and Secret Id
+Firs, before proceed, make sure you have the policies and secrets in place, [check this link](https://learn.hashicorp.com/tutorials/vault/approle) on vault to see how to use and configure approles on vault.
+
+Then, add this config on your serverless.yml
+```
+custom:
+
+  vault:
+    role_id: ${env:TOKEN_VAULT}
+    secret_id: ${env:SECRET_TOKEN}
+    method: "approle"
+    url: "http://localhost:8200"
+    version: "v2"
 ```
 
 ### Example how to use the plugin with Userpass method auth

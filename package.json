@@ -36,17 +36,16 @@
     "serverless.com"
   ],
   "main": "index.js",
-  "bin": {},
   "scripts": {
     "test": "mocha -t 10000",
     "lint": "eslint ."
   },
   "devDependencies": {
-    "js-yaml": ">=3.13.1",
+    "chai": "4.0.2",
     "eslint": "^4.0.0",
+    "js-yaml": ">=3.13.1",
     "mocha": "5.2.0",
     "serverless": "^1.32.0",
-    "chai": "4.0.2",
     "serverless-plugin-scripts": "^1.0.2"
   },
   "bugs": {
