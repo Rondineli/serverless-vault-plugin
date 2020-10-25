@@ -1,7 +1,7 @@
 {
   "name": "serverless-vault-plugin",
   "description": "Serverless plugin for retrieve secrets from vault and input on kms",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "dependencies": {
     "aws-sdk": "2.313.0",
     "js-yaml": ">=3.13.1",
@@ -36,17 +36,16 @@
     "serverless.com"
   ],
   "main": "index.js",
-  "bin": {},
   "scripts": {
     "test": "mocha -t 10000",
     "lint": "eslint ."
   },
   "devDependencies": {
+    "chai": "4.0.2",
+    "eslint": "^4.19.1",
     "js-yaml": ">=3.13.1",
-    "eslint": "^4.0.0",
     "mocha": "5.2.0",
     "serverless": "^1.32.0",
-    "chai": "4.0.2",
     "serverless-plugin-scripts": "^1.0.2"
   },
   "bugs": {

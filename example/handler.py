@@ -1,4 +1,3 @@
-import requests
 import boto3
 import os
 import json
@@ -20,6 +19,9 @@ for key, value in os.environ.items():
     decrypt(key, value)
 
 def hello(event, context):
+    for key, value in os.environ.items():
+        decrypt(key, value)
     environ_data = os.environ.copy()
     data = json.dumps(environ_data)
     return data
+

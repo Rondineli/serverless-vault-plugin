@@ -53,6 +53,38 @@ class ServerlessPlugin {
       };
     });
   }
+  /**
+   * @private
+   * @returns {Promise}
+   */
+  requestappRoleSecret() {
+    const  myOptions = {
+      url : this.serverless.service.custom.vault.url + '/v1/auth/approle/login',
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/json'
+      },
+      json: {
+        'role_id': this.serverless.service.custom.vault.role_id,
+        'secret_id': this.serverless.service.custom.vault.secret_id
+      },
+      strictSSL: !!this.serverless.service.custom.vault.ssl_check
+    };
+
+    return new Promise((resolve, reject) => {
+      request.post(myOptions, (error, response = {}, body) => {
+        if (!error && typeof response.statusCode !== 'undefined' && response.statusCode == 200) {
+          resolve(body);
+        } else {
+          this.serverless.cli.log('Error to authenticate on Vaul: ' + error + ' Response: ' + JSON.stringify(body) + ' StatusCode: ' + response.statusCode);
+          reject(error);
+        }
+      });
+    }).then(data => {
+      return data;
+    });
+  }
+
 
   /**
    * @private
@@ -162,7 +194,7 @@ class ServerlessPlugin {
         } else {
           this.serverless.cli.log('Problems retrieving keys from vault: Check your secret uri, current uri: ' + baseUrl); 
           if (response.statusCode == '401' || response.statusCode == '403') {
-            this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' StatusCode: ' + response.statusCode);
+            this.serverless.cli.log('Error to authenticate on Vault: ' + error + ' Response: ' + JSON.stringify(body) + ' StatusCode: ' + response.statusCode);
           }
           reject(this);
         }
@@ -302,8 +334,13 @@ class ServerlessPlugin {
         });
       } else if (methodAuth === 'token') {
         resolve(this.method(null, baseUrl));
+      } else if (methodAuth === 'approle') {
+        this.requestappRoleSecret().then((result) => {
+          const token = result['auth']['client_token'];
+          resolve(this.method(token, baseUrl));
+        });
       } else {
-        reject('method key must be: \'userpass\' or \'token\' by default: \'token\'');
+        reject('method key must be: \'userpass\' or \'token\' or \'approle\' by default: \'token\'');
       }
     }).then(() => {
       if (ignoreVars.hasOwnProperty('ignore')) {
