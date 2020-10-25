@@ -3,8 +3,8 @@
   "description": "Serverless plugin for retrieve secrets from vault and input on kms",
   "version": "1.4.2",
   "dependencies": {
-    "js-yaml": ">=3.13.1",
     "aws-sdk": "2.313.0",
+    "js-yaml": ">=3.13.1",
     "request": "^2.88.0",
     "serverless": "^1.32.0",
     "serverless-plugin-scripts": "^1.0.2"
