@@ -20,6 +20,7 @@ class ServerlessPlugin {
 
     this.hooks = {
       'before:package:initialize': this.getVaultSecrets.bind(this),
+      'before:offline:start:init': this.getVaultSecrets.bind(this),
       'before:vault:vault': this.getVaultSecrets.bind(this), // Shows encrypted passwords from vault and kms
     };
     this.kms = new aws.KMS({region: this.options.region});
