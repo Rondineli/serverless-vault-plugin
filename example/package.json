@@ -3,7 +3,7 @@
   "description": "",
   "version": "0.1.0",
   "dependencies": {
-    "aws-sdk": "^2.313.0",
+    "aws-sdk": "^2.814.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.2",
     "serverless-plugin-scripts": "^1.0.2",
